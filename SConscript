@@ -1,4 +1,4 @@
-Import('env', 'arch', 'zmq', 'is_tbp')
+Import('env', 'arch', 'zmq')
 gen_dir = Dir('gen')
 messaging_dir = Dir('messaging')
 
@@ -54,11 +54,8 @@ Depends('messaging/impl_zmq.cc', services_h)
 
 # note, this rebuilds the deps shared, zmq is statically linked to make APK happy
 # TODO: get APK to load system zmq to remove the static link
-if is_tbp:
-  shared_lib_shared_lib = [zmq, 'm', 'stdc++']
-else:
-  shared_lib_shared_lib = [zmq, 'm', 'stdc++'] + ["gnustl_shared"] if arch == "aarch64" else [zmq]
-  env.SharedLibrary('messaging_shared', messaging_objects, LIBS=shared_lib_shared_lib)
+shared_lib_shared_lib = [zmq, 'm', 'stdc++'] + ["gnustl_shared"] if arch == "aarch64" else [zmq]
+env.SharedLibrary('messaging_shared', messaging_objects, LIBS=shared_lib_shared_lib)
 
 env.Program('messaging/bridge', ['messaging/bridge.cc'], LIBS=[messaging_lib, 'zmq'])
 Depends('messaging/bridge.cc', services_h)
